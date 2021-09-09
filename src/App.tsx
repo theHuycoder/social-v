@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import {useLocation, Redirect, Switch, Route} from "react-router-dom";
+import {withoutValidateRoutes, withValidateRoutes} from "./routes/app.routes";
+import withAuthentication from "./common-wrapper/withAuthentication";
+import withQuery from './common-wrapper/withQuery';
+import useProgressBar from './hooks/useProgressBar';
+import ProgressBar from './common-ui/ProgressBar/ProgressBar';
 
 function App() {
+
+  const location = useLocation();
+  if ((location.pathname === "" || location.pathname === "/")) {
+    return <Redirect to="/authentication/login"/>
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        {/*<ProgressBar/>*/}
+      <Switch>
+        {
+          withoutValidateRoutes &&
+          withoutValidateRoutes.length > 0 &&
+          withoutValidateRoutes.map(({name, component, ...props}) => {
+            return <Route key={name} {...props} render={() => component()}/>
+          })
+        }
+        {
+          withoutValidateRoutes &&
+          withoutValidateRoutes.length > 0 &&
+          withoutValidateRoutes.map(({name, component, ...props}) => {
+            return <Route key={name} {...props} render={() => withAuthentication(component())}/>
+          })
+        }
+      </Switch>
+
     </div>
   );
 }
 
-export default App;
+export default withQuery(App);
